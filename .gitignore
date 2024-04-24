@@ -3,3 +3,4 @@ venv/
 *.pyc
 logs/*
 __pycache__/
+migrations/
