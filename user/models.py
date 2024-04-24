@@ -1,4 +1,5 @@
 
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth.hashers import make_password
@@ -11,6 +12,7 @@ class CustomManager(UserManager):
             raise ValueError('Укажите почту')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        user.create_activation_code()
         user.password = make_password(password)
         user.save(using=self._db)
         return user
@@ -43,6 +45,21 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = []
     last_active = models.DateTimeField(auto_now=True)
     last_change_password = models.DateTimeField(null=True, blank=True, verbose_name='Последняя смена пароля')
+    activation_code = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return self.email
+
+    def create_activation_code(self):
+        code = str(uuid.uuid4())
+        self.activation_code = code
+
+
+class UserPasswords(models.Model):
+    user = models.ForeignKey(CustomUser, verbose_name='Пользователь', on_delete=models.CASCADE)
+    password = models.CharField(max_length=150, verbose_name='Пароль')  # TODO
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Пароль пользователя'
+        verbose_name_plural = 'Пароли пользователя'
