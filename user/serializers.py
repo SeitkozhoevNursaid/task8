@@ -8,6 +8,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
 from user.models import CustomUser, UserPasswords
+from user.tasks import send_activation_code, send_reset_password
 
 
 class RegistrationSerializer(serializers.Serializer):
@@ -22,11 +23,6 @@ class RegistrationSerializer(serializers.Serializer):
     password2 = serializers.CharField(
         max_length=128,
         write_only=True,
-    )
-    role = serializers.CharField(
-        max_length=10,
-        write_only=True,
-        required=False
     )
 
     def validate(self, data):
@@ -61,6 +57,8 @@ class RegistrationSerializer(serializers.Serializer):
         validated_data.pop('password2')
         validated_data.setdefault('last_change_password', timezone.now())
         user = CustomUser.objects.create_user(**validated_data)
+        print(f"ssssssssss{validated_data['email']}")
+        send_activation_code(validated_data['email'], user.activation_code)
         
         UserPasswords.objects.create(password=user.password, user=user)
         return validated_data
@@ -207,6 +205,7 @@ class AdminResetPasswordSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.last_change_password = timezone.now()
         user.save(update_fields=['password', 'last_change_password'])
+        send_reset_password(validated_data['email'], new_password)
 
         UserPasswords.objects.create(password=user.password, user=user)
         return validated_data

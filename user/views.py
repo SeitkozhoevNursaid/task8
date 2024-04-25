@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from user.models import CustomUser
+from user.tasks import send_forgot_password
 from user.serializers import (
     RegistrationSerializer,
     ChangePasswordSerializer,
@@ -57,6 +58,8 @@ class ForgotPassword(APIView):
         serializer = self.serializer_class(instance=request.data['email'], data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        send_forgot_password(request.data['email'], email.activation_code)
 
         return Response('Мы отправили вам письмо на почту с ссылкой на сброс пароля!)')
 
