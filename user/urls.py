@@ -13,7 +13,7 @@ from user.views import (
 urlpatterns = [
     path('auth/', TokenObtainPairView.as_view()),
     path('auth/refresh', TokenRefreshView.as_view()),
-    path('registration/', RegistrationAPIView.as_view()),
+    path('register/', RegistrationAPIView.as_view()),
     path('email-verify/<uuid:activation_code>/', VerifyEmail.as_view()),
     path('change_password/', ChangePassword.as_view()),
     path('forgot-password/', ForgotPassword.as_view()),
