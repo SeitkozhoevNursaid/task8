@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     #libraries,
     'rest_framework',
     'rest_framework_simplejwt',
+    'BruteBuster',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'BruteBuster.middleware.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -132,11 +134,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#JWT configuration
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=155),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -149,9 +153,14 @@ REST_FRAMEWORK = {
     ],
 }
 
+#Email configuration
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+
+#BruteBuster configuration
+BB_MAX_FAILURES = 3
+BB_BLOCK_INTERVAL = 1
