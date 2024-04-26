@@ -1,6 +1,8 @@
 .env
 venv/
-*.pyc
 logs/*
-__pycache__/
-migrations/
+user/__pycache__/
+config/__pycache__/
+user/migrations/__init__.py
+car/__pycache__/
+car/migrations/__init__.py
