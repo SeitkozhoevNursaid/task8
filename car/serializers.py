@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from car.models import Car, Category
+from car.models import Car, Category, CarImg
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -55,3 +55,30 @@ class CarUpdateSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         return instance
+
+
+class CarImgSerializer(serializers.ModelSerializer):
+    name = serializers.StringRelatedField()
+    images = serializers.ImageField(max_length=None, use_url=True)
+
+    class Meta:
+        model = CarImg
+        fields = '__all__'
+
+
+class CarCreateSerializer(serializers.ModelSerializer):
+    img = serializers.FileField(required=False)
+
+    def create(self, validated_data):
+        img = validated_data.pop('img')
+        car = Car.objects.create(**validated_data)
+        files = [img]
+        images = []
+        for file in files:
+            images.append(CarImg(name=car, images=file))
+        CarImg.objects.bulk_create(images)
+        return car
+
+    class Meta:
+        model = Car
+        fields = '__all__'

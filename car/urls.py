@@ -5,7 +5,9 @@ from car.views import (
     CarDestroyAPIView,
     CarListAPIView,
     CarRetrieveAPIView,
-    CarUpdateAPIView)
+    CarUpdateAPIView,
+    CarImgRetrieveDestroyUpdate,
+    CarImgListAPIView)
 
 
 urlpatterns = [
@@ -14,4 +16,6 @@ urlpatterns = [
     path('car/<int:pk>/', CarRetrieveAPIView.as_view()),
     path('car/delete/<int:pk>/', CarDestroyAPIView.as_view()),
     path('car/update/<int:pk>/', CarUpdateAPIView.as_view()),
+    path('car/images/', CarImgListAPIView.as_view()),
+    path('car/image/<int:pk>/', CarImgRetrieveDestroyUpdate.as_view()),
 ]

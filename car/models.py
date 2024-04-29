@@ -13,10 +13,23 @@ class Car(models.Model):
     name = models.CharField(("Название машины"), max_length=50)
     description = models.CharField(("Описание машины"), max_length=250)
     price = models.IntegerField(('Цена машины'))
-    images = models.ImageField(("Фото машины"), upload_to='images/', null=True, blank=True)
     category = models.ForeignKey(Category, verbose_name=('Категория'), on_delete=models.CASCADE,)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'Машина'
         verbose_name_plural = 'Машины'
-        
+
+
+class CarImg(models.Model):
+    images = models.FileField(("Фото машины"), upload_to='images/', null=True, blank=True)
+    name = models.ForeignKey(Car, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name = 'Изображение'
+        verbose_name_plural = 'Изображения'

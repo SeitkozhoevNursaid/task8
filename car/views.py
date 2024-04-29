@@ -3,12 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 
-from car.serializers import CarSerializer, CategorySerializer, CarUpdateSerializer
-from car.models import Car
+from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSerializer, CarImgSerializer
+from car.models import Car, CarImg
 
 
 class CarCreateAPIView(APIView):
-    serializer_class = CarSerializer
+    serializer_class = CarCreateSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -58,3 +58,13 @@ class CarRetrieveAPIView(APIView):
         serializer = self.serializer_class(queryset)
 
         return Response(serializer.data)
+
+
+class CarImgRetrieveDestroyUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CarImg.objects.all()
+    serializer_class = CarImgSerializer
+
+
+class CarImgListAPIView(generics.ListAPIView):
+    queryset = CarImg.objects.all()
+    serializer_class = CarImgSerializer
