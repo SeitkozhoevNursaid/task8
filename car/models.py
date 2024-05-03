@@ -11,9 +11,9 @@ class Category(models.Model):
         
 class Car(models.Model):
     name = models.CharField(("Название машины"), max_length=50)
-    description = models.CharField(("Описание машины"), max_length=250)
-    price = models.IntegerField(('Цена машины'))
-    category = models.ForeignKey(Category, verbose_name=('Категория'), on_delete=models.CASCADE,)
+    description = models.CharField(("Описание машины"), max_length=500)
+    price = models.CharField(('Цена машины'), max_length=50)
+    category = models.ForeignKey(Category, verbose_name=('Категория'), on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name

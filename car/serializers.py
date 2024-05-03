@@ -82,3 +82,31 @@ class CarCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = '__all__'
+
+
+class CarParsingSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        max_length=50,
+        write_only=True,
+        required=False
+    )
+    description = serializers.CharField(
+        max_length=250,
+        write_only=True,
+        required=False
+    )
+    price = serializers.IntegerField(
+        write_only=True,
+        required=False
+    )
+    category = serializers.CharField(
+        write_only=True,
+        required=False
+    )
+    images = serializers.ImageField(
+        required=False,
+    )
+
+    class Meta:
+        model = Car
+        fields = '__all__'

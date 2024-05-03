@@ -29,7 +29,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 AUTH_USER_MODEL = 'user.CustomUser'
 # Application definition
@@ -177,3 +178,5 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+TELEGRAM_BOT_TOKEN = '6901085243:AAF8AUoXEi2yYDHMYRyqdZUS3Uz6DJy-arA'

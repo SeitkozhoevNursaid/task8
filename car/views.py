@@ -1,10 +1,13 @@
+import requests
+from bs4 import BeautifulSoup
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
+from django.http import JsonResponse
 
-from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSerializer, CarImgSerializer
-from car.models import Car, CarImg
+from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSerializer, CarImgSerializer, CarParsingSerializer
+from car.models import Car, CarImg, Category
 
 
 class CarCreateAPIView(APIView):
@@ -68,3 +71,99 @@ class CarImgRetrieveDestroyUpdate(generics.RetrieveUpdateDestroyAPIView):
 class CarImgListAPIView(generics.ListAPIView):
     queryset = CarImg.objects.all()
     serializer_class = CarImgSerializer
+
+
+class CarParsingAPIView(APIView):
+    def get(self, request, name):
+        url = f"https://m.mashina.kg/new/search/{name}"
+        print(f"requestttttt{url}")
+        try:
+            page = requests.get(url)
+            soup = BeautifulSoup(page.text, 'html.parser')
+
+            list_div = soup.find_all('div', class_='listing-item main')
+            cars_data = []
+
+            for div in list_div:
+                links = div.find_all('a')
+                for link in links:
+                    car_url = f"https://m.mashina.kg{link['href']}"
+                    print(f"Ссылка машины: {car_url}")
+                    car_data = self.parse_car_page(car_url)
+                    cars_data.append(car_data)
+
+            return JsonResponse(cars_data, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def parse_car_page(self, url):
+        try:
+            page = requests.get(url)
+            soup = BeautifulSoup(page.text, 'html.parser')
+            description_element = soup.find('div', class_='characteristics')
+
+            """Категория"""
+            for category_element in description_element:
+                category_element = description_element.find_all('div', class_='info')
+
+                categoryslice = category_element[1]
+                category_value = categoryslice.find('span', class_='value')
+
+                if category_element:
+                    category = category_value.get_text(strip=True)
+                else:
+                    category = 'Нет категории'
+
+            """Описание"""
+            if description_element:
+                description = description_element.get_text(strip=True)
+            else:
+                description = 'Нет описания'
+
+            """Картинка"""
+            div_page = soup.find("div", class_="page-content")
+            up = div_page.find('div', class_='details-section ad')
+            up1 = up.find('div', class_='left')
+            up2 = up1.find('div', class_='content image')
+            general = up2.find('div', class_='fotorama').find('img')
+
+            if general:
+                image = general.get('src')
+            else:
+                image = 'Без названия.jpeg'
+
+            """Название"""
+            div_page = soup.find("div", class_="page-content")
+            for name_element in div_page:
+                name_element = div_page.find('h1')
+                if name_element:
+                    name = name_element.get_text(strip=True)
+                else:
+                    name = 'Нет названия'
+
+            """Цена"""
+            price_element = soup.find("span", class_="white custom-margins font-big")
+            if price_element:
+                price = price_element.get_text(strip=True)
+            else:
+                price = 'Нет цены'
+
+            category, new_category = Category.objects.get_or_create(name=category)
+            car, created = Car.objects.get_or_create(name=name, price=price, defaults={'description': description, 'category': category})
+            car_img = CarImg.objects.get_or_create(name=car, images=image)
+
+            if created:
+                print(f"Создана новая машина: {name}")
+            else:
+                print(f"Машина: {name}")
+
+            if new_category:
+                print("Создано")
+            else:
+                print('Отлично')
+
+            return {'name': name, 'price': price, 'description': description, 'image': image}  # Возвращаем данные машины
+
+        except Exception as e:
+            print(f"Ошибка при парсинге страницы машины {url}: {str(e)}")
+            return {'error': str(e)} 

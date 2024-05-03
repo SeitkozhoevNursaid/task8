@@ -7,8 +7,9 @@ from car.views import (
     CarRetrieveAPIView,
     CarUpdateAPIView,
     CarImgRetrieveDestroyUpdate,
+    CarParsingAPIView,
     CarImgListAPIView)
-
+from car import telegram
 
 urlpatterns = [
     path('cars/', CarListAPIView.as_view()),
@@ -18,4 +19,6 @@ urlpatterns = [
     path('car/update/<int:pk>/', CarUpdateAPIView.as_view()),
     path('car/images/', CarImgListAPIView.as_view()),
     path('car/image/<int:pk>/', CarImgRetrieveDestroyUpdate.as_view()),
+    path('car/parsing/<str:name>/', CarParsingAPIView.as_view()),
+    path('telegram/', telegram.webhook)
 ]
