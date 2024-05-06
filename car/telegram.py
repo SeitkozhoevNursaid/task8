@@ -1,27 +1,14 @@
 import telebot
-import threading
 import requests
-from car.views import CarParsingAPIView
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+
+from decouple import config
 
 
-TOKEN = '6901085243:AAF8AUoXEi2yYDHMYRyqdZUS3Uz6DJy-arA'
+TOKEN = config('TOKEN')
 bot = telebot.TeleBot(TOKEN)
-car_parsing = CarParsingAPIView()
 
 def polling_thread():
     bot.polling(none_stop=True)
-
-@csrf_exempt
-def webhook(request):
-    if request.method == 'POST':
-        json_str = request.body.decode('UTF-8')
-        update = telebot.types.Update.de_json(json_str)
-        bot.process_new_updates([update])
-        return HttpResponse('ok')
-    else:
-        return HttpResponse('Метод не поддерживается')
 
 
 @bot.message_handler(commands=['start'])
@@ -71,16 +58,16 @@ def get_car_data(text:str):
             print(f"data:::::{data}")
             return data
         else:
-            return {'error': 'Ошибка при получении данных машины'}
+            return {'Ошибка': 'Ошибка при получении данных машины'}
     except Exception as e:
         print(f"Ошибка при получении данных машины: {str(e)}")
-        return {'error': str(e)}
+        return {'Ошибка': str(e)}
 
 
 def send_car_data(chat_id, data):
     for i in data:
-        if 'error' in i:
-            bot.send_message(chat_id, f"Ошибка: {i['error']}")
+        if 'Ошибка' in i:
+            bot.send_message(chat_id, f"Ошибка: {i['Ошибка']}")
         else:
             name = i.get('name', 'Нет данных о названии')
             price = i.get('price', 'Нет данных о цене')
@@ -89,12 +76,7 @@ def send_car_data(chat_id, data):
 
             description_lines = description
             formatted_string = description_lines.replace('Характеристики', '\nХарактеристики').replace('Год выпуска', '\nГод выпуска ').replace('Кузов', '\nКузов ').replace('Цвет', '\nЦвет ').replace('Двигатель', '\nДвигатель ').replace('Коробка передач', '\nКоробка передач ').replace('Привод', '\nПривод ').replace('Расход топлива,', '\nРасход топлива ').replace('Разгон до 100 км/ч,', '\nРазгон до 100 км/ч, ')
-
             
             message = f"Название: {name}\nЦена: {price}\nОписание:{formatted_string}"
             bot.send_photo(chat_id, image)
             bot.send_message(chat_id, message)
-
-
-polling_thread = threading.Thread(target=polling_thread)
-polling_thread.start()

@@ -5,7 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from django.http import JsonResponse
+from celery import shared_task
 
+from car.tasks import run_telegram_bot
 from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSerializer, CarImgSerializer, CarParsingSerializer
 from car.models import Car, CarImg, Category
 
@@ -73,6 +75,14 @@ class CarImgListAPIView(generics.ListAPIView):
     serializer_class = CarImgSerializer
 
 
+class RunTelegramBot(APIView):
+
+    def get(self, request):
+        run_telegram_bot.delay()
+
+        return Response('Бот успешно запущен!')
+
+
 class CarParsingAPIView(APIView):
     def get(self, request, name):
         url = f"https://m.mashina.kg/new/search/{name}"
@@ -94,7 +104,7 @@ class CarParsingAPIView(APIView):
 
             return JsonResponse(cars_data, safe=False)
         except Exception as e:
-            return JsonResponse({'Ошибка': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return JsonResponse({'Ошибка': str(e)}, status=500)
 
     def parse_car_page(self, url):
         try:
@@ -162,7 +172,7 @@ class CarParsingAPIView(APIView):
             else:
                 print('Отлично')
 
-            return {'name': name, 'price': price, 'description': description, 'image': image}  # Возвращаем данные машины
+            return {'name': name, 'price': price, 'description': description, 'image': image}
 
         except Exception as e:
             print(f"Ошибка при парсинге страницы машины {url}: {str(e)}")
