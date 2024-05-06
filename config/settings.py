@@ -42,11 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     #apps,
     'user',
     'car',
-
     #libraries,
     'rest_framework',
     'rest_framework_simplejwt',
@@ -170,7 +168,7 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 
 #BruteBuster configuration
-BB_MAX_FAILURES = 5
+BB_MAX_FAILURES = 3
 BB_BLOCK_INTERVAL = 1
 
 #Swagger
@@ -181,9 +179,4 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-#telegram
-TELEGRAM_BOT_TOKEN = config('TOKEN')
-
-#celery
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+TELEGRAM_BOT_TOKEN = '6901085243:AAF8AUoXEi2yYDHMYRyqdZUS3Uz6DJy-arA'
