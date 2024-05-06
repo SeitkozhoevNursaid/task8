@@ -11,14 +11,16 @@ def send_activation_code(user, code):
     send_mail(subject, message, from_email, recipient_list)
 
 
+@shared_task
 def send_forgot_password(user, code): 
     subject = 'Здравствуйте'
     message =  f'для сброса пароля пожалуйста перейдите по ссылке, http://127.0.0.1:8000/confirm-forgot-password/{code}/'
     from_email = 'nursaid.seitkozhoev@mail.ru'
     recipient_list = [user]
     send_mail(subject, message, from_email, recipient_list)
-    
 
+
+@shared_task
 def send_reset_password(user, new_password):
     subject = 'Здравствуйте'          
     message = f'Мы сбросили ваш пароль, ваш новый пароль "{new_password}", с уважением Администрация)'

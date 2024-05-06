@@ -205,7 +205,7 @@ class AdminResetPasswordSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.last_change_password = timezone.now()
         user.save(update_fields=['password', 'last_change_password'])
-        send_reset_password(validated_data['email'], new_password)
+        send_reset_password.delay(validated_data['email'], new_password)
 
         UserPasswords.objects.create(password=user.password, user=user)
         return validated_data

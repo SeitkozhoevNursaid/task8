@@ -59,7 +59,7 @@ class ForgotPassword(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        send_forgot_password(request.data['email'], email.activation_code)
+        send_forgot_password.delay(request.data['email'], email.activation_code)
 
         return Response('Мы отправили вам письмо на почту с ссылкой на сброс пароля!)')
 
