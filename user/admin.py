@@ -23,7 +23,7 @@ class CustomAdmin(UserAdmin):
         ),
         (("Important dates"), {"fields": ("last_login", "date_joined", "last_change_password")}),
     )
-    
+
     add_fieldsets = (
         (
             None,
