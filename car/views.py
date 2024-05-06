@@ -94,7 +94,7 @@ class CarParsingAPIView(APIView):
 
             return JsonResponse(cars_data, safe=False)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return JsonResponse({'Ошибка': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def parse_car_page(self, url):
         try:
@@ -166,4 +166,4 @@ class CarParsingAPIView(APIView):
 
         except Exception as e:
             print(f"Ошибка при парсинге страницы машины {url}: {str(e)}")
-            return {'error': str(e)} 
+            return {'Ошибка': str(e)}
