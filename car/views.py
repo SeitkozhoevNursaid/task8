@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from car.tasks import parse_car_page
 from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSerializer, CarImgSerializer, CarParsingSerializer
 from car.models import Car, CarImg, Category
-from car.telegram import start_polling
+
 
 class CarCreateAPIView(APIView):
     serializer_class = CarCreateSerializer
@@ -124,11 +124,3 @@ class TestParsing(APIView):
         else:
             list_images = 'error'
         print(f"images:{list_images}")
-
-
-class StartPolling(APIView):
-
-    def get(self, request):
-        start_polling()
-
-        return Response('Бот запущен!')

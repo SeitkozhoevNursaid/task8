@@ -9,9 +9,8 @@ from car.views import (
     CarImgRetrieveDestroyUpdate,
     CarParsingAPIView,
     TestParsing,
-    StartPolling,
     CarImgListAPIView)
-
+from car import telegram
 
 urlpatterns = [
     path('cars/', CarListAPIView.as_view()),
@@ -23,5 +22,4 @@ urlpatterns = [
     path('car/image/<int:pk>/', CarImgRetrieveDestroyUpdate.as_view()),
     path('car/parsing/<str:name>/', CarParsingAPIView.as_view()),
     path('test/', TestParsing.as_view()),
-    path('start/', StartPolling.as_view())
 ]

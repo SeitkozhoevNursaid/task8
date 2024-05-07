@@ -7,8 +7,11 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        
-        
+
+    def __str__(self) -> str:
+        return self.name       
+
+
 class Car(models.Model):
     name = models.CharField(("Название машины"), max_length=50)
     description = models.CharField(("Описание машины"), max_length=800)

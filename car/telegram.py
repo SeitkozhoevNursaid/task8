@@ -4,17 +4,13 @@ import threading
 
 from decouple import config
 
+
 TOKEN = config('TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
 
 def polling_thread():
     bot.polling(none_stop=True)
-
-
-def start_polling():
-    polling = threading.Thread(target=polling_thread)
-    polling.start()
 
 
 @bot.message_handler(commands=['start'])
@@ -78,9 +74,26 @@ def send_car_data(chat_id, data):
             description = i.get('description', 'Нет описания')
             image = i.get('image', 'https://placekitten.com/200/200')
 
-            description_lines = description
-            formatted_string = description_lines.replace('Характеристики', '\nХарактеристики').replace('Год выпуска', '\nГод выпуска ').replace('Кузов', '\nКузов ').replace('Цвет', '\nЦвет ').replace('Двигатель', '\nДвигатель ').replace('Коробка передач', '\nКоробка передач ').replace('Привод', '\nПривод ').replace('Расход топлива,', '\nРасход топлива ').replace('Разгон до 100 км/ч,', '\nРазгон до 100 км/ч, ')
-            
+            replacements = {
+                'Характеристики': '\nХарактеристики',
+                'Год выпуска': '\nГод выпуска ',
+                'Кузов': '\nКузов ',
+                'Цвет': '\nЦвет ',
+                'Двигатель': '\nДвигатель ',
+                'Коробка передач': '\nКоробка передач ',
+                'Привод': '\nПривод ',
+                'Расход топлива,': '\nРасход топлива ',
+                'Разгон до 100 км/ч,': '\nРазгон до 100 км/ч, '
+            }
+
+            formatted_string = description
+            for old, new in replacements.items():
+                formatted_string = formatted_string.replace(old, new)
+
             message = f"Название: {name}\nЦена: {price}\nОписание:{formatted_string}"
             bot.send_photo(chat_id, image)
             bot.send_message(chat_id, message)
+
+
+polling = threading.Thread(target=polling_thread)
+polling.start()
