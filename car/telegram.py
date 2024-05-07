@@ -9,10 +9,7 @@ bot = telebot.TeleBot(TOKEN)
 
 
 def polling_thread():
-    try:
-        bot.polling(none_stop=True)
-    except Exception:
-        print(f"Ошибка во время работы бота:{Exception}")
+    bot.polling(none_stop=True)
 
 
 def start_polling():
@@ -62,14 +59,12 @@ def get_car_data(text:str):
         name = text.lower()
         url = f'http://127.0.0.1:8000/api/car/parsing/{name}/'
         response = requests.get(url=url)
-        print(f"responseeeeee{response}")
         if response.status_code == 200:
             data = response.json()
             return data
         else:
             return {'Ошибка': 'Ошибка при получении данных машины'}
     except Exception as e:
-        print(f"Ошибка при получении данных машины: {str(e)}")
         return {'Ошибка': str(e)}
 
 

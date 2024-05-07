@@ -10,6 +10,7 @@ from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSeriali
 from car.models import Car, CarImg, Category
 from car.telegram import start_polling
 
+
 class CarCreateAPIView(APIView):
     serializer_class = CarCreateSerializer
 
@@ -101,7 +102,6 @@ class TestParsing(APIView):
     def get(self, request):
         url = 'https://m.mashina.kg/new/details/kia-k5-63ca2c96a9779355251584'
         page = requests.get(url)
-        print(f"status{page}")
         soup = BeautifulSoup(page.text, 'html.parser')
         
         #обращение напрямую
@@ -133,3 +133,7 @@ class StartPolling(APIView):
         start_polling()
 
         return Response('Бот запущен!')
+#replace
+#Запуск ботов
+#Админка
+#Принты убрать

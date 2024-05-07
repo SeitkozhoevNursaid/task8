@@ -56,21 +56,10 @@ def parse_car_page(url):
             price = 'Нет цены'
         category, new_category = Category.objects.get_or_create(name=category)
         car, created = Car.objects.get_or_create(name=name, price=price, defaults={'description': description, 'category': category})
-        car_img = CarImg.objects.get_or_create(name=car, images=image)
-
-        if created:
-            print(f"Создана новая машина: {name}")
-        else:
-            print(f"Машина: {name}")
-
-        if new_category:
-            print("Создано")
-        else:
-            print('Отлично')
+        CarImg.objects.get_or_create(name=car, images=image)
 
         data = {'name': name, 'price': price, 'description': description, 'image': image}
         return data
 
     except Exception as e:
-        print(f"Ошибка при парсинге страницы машины {url}: {str(e)}")
         return {'Ошибка': str(e)}
