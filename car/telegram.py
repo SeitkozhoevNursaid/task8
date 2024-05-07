@@ -1,14 +1,23 @@
 import telebot
 import requests
+import threading
 
 from decouple import config
-
 
 TOKEN = config('TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
+
 def polling_thread():
-    bot.polling(none_stop=True)
+    try:
+        bot.polling(none_stop=True)
+    except Exception:
+        print(f"Ошибка во время работы бота:{Exception}")
+
+
+def start_polling():
+    polling = threading.Thread(target=polling_thread)
+    polling.start()
 
 
 @bot.message_handler(commands=['start'])
@@ -53,9 +62,9 @@ def get_car_data(text:str):
         name = text.lower()
         url = f'http://127.0.0.1:8000/api/car/parsing/{name}/'
         response = requests.get(url=url)
+        print(f"responseeeeee{response}")
         if response.status_code == 200:
             data = response.json()
-            print(f"data:::::{data}")
             return data
         else:
             return {'Ошибка': 'Ошибка при получении данных машины'}

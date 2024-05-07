@@ -1,16 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from django.http import JsonResponse
-from celery import shared_task
 
-from car.tasks import run_telegram_bot
+from car.tasks import parse_car_page
 from car.serializers import CarSerializer, CarCreateSerializer, CarUpdateSerializer, CarImgSerializer, CarParsingSerializer
 from car.models import Car, CarImg, Category
-
+from car.telegram import start_polling
 
 class CarCreateAPIView(APIView):
     serializer_class = CarCreateSerializer
@@ -75,18 +73,9 @@ class CarImgListAPIView(generics.ListAPIView):
     serializer_class = CarImgSerializer
 
 
-class RunTelegramBot(APIView):
-
-    def get(self, request):
-        run_telegram_bot.delay()
-
-        return Response('Бот успешно запущен!')
-
-
 class CarParsingAPIView(APIView):
     def get(self, request, name):
         url = f"https://m.mashina.kg/new/search/{name}"
-        print(f"requestttttt{url}")
         try:
             page = requests.get(url)
             soup = BeautifulSoup(page.text, 'html.parser')
@@ -98,82 +87,49 @@ class CarParsingAPIView(APIView):
                 links = div.find_all('a')
                 for link in links:
                     car_url = f"https://m.mashina.kg{link['href']}"
-                    print(f"Ссылка машины: {car_url}")
-                    car_data = self.parse_car_page(car_url)
-                    cars_data.append(car_data)
+                    car_data = parse_car_page.delay(car_url)
+                    result = car_data.get()
+                    cars_data.append(result)
 
             return JsonResponse(cars_data, safe=False)
         except Exception as e:
             return JsonResponse({'Ошибка': str(e)}, status=500)
 
-    def parse_car_page(self, url):
-        try:
-            page = requests.get(url)
-            soup = BeautifulSoup(page.text, 'html.parser')
-            description_element = soup.find('div', class_='characteristics')
 
-            """Категория"""
-            for category_element in description_element:
-                category_element = description_element.find_all('div', class_='info')
+class TestParsing(APIView):
 
-                categoryslice = category_element[1]
-                category_value = categoryslice.find('span', class_='value')
+    def get(self, request):
+        url = 'https://m.mashina.kg/new/details/kia-k5-63ca2c96a9779355251584'
+        page = requests.get(url)
+        print(f"status{page}")
+        soup = BeautifulSoup(page.text, 'html.parser')
+        
+        #обращение напрямую
+        images = soup.find('div', class_='fotorama__img').find('img')
+        
+        #Дивы в диве
+        div_page = soup.find("div", class_="page-content")
+        up = div_page.find('div', class_='details-section ad')
+        up1 = up.find('div', class_='left')
+        up2 = up1.find('div', class_='content image')
+        general = up2.find('div', class_='fotorama').find('img')
+        
+        if general:
+            image = general.get('src')
+        else:
+            image = 'Без названия.jpeg'
+        print(f"general:{image}")
+        
+        if images:
+            list_images = list(images.get('src'))
+        else:
+            list_images = 'error'
+        print(f"images:{list_images}")
 
-                if category_element:
-                    category = category_value.get_text(strip=True)
-                else:
-                    category = 'Нет категории'
 
-            """Описание"""
-            if description_element:
-                description = description_element.get_text(strip=True)
-            else:
-                description = 'Нет описания'
+class StartPolling(APIView):
 
-            """Картинка"""
-            div_page = soup.find("div", class_="page-content")
-            up = div_page.find('div', class_='details-section ad')
-            up1 = up.find('div', class_='left')
-            up2 = up1.find('div', class_='content image')
-            general = up2.find('div', class_='fotorama').find('img')
+    def get(self, request):
+        start_polling()
 
-            if general:
-                image = general.get('src')
-            else:
-                image = 'Без названия.jpeg'
-
-            """Название"""
-            div_page = soup.find("div", class_="page-content")
-            for name_element in div_page:
-                name_element = div_page.find('h1')
-                if name_element:
-                    name = name_element.get_text(strip=True)
-                else:
-                    name = 'Нет названия'
-
-            """Цена"""
-            price_element = soup.find("span", class_="white custom-margins font-big")
-            if price_element:
-                price = price_element.get_text(strip=True)
-            else:
-                price = 'Нет цены'
-
-            category, new_category = Category.objects.get_or_create(name=category)
-            car, created = Car.objects.get_or_create(name=name, price=price, defaults={'description': description, 'category': category})
-            car_img = CarImg.objects.get_or_create(name=car, images=image)
-
-            if created:
-                print(f"Создана новая машина: {name}")
-            else:
-                print(f"Машина: {name}")
-
-            if new_category:
-                print("Создано")
-            else:
-                print('Отлично')
-
-            return {'name': name, 'price': price, 'description': description, 'image': image}
-
-        except Exception as e:
-            print(f"Ошибка при парсинге страницы машины {url}: {str(e)}")
-            return {'Ошибка': str(e)}
+        return Response('Бот запущен!')
