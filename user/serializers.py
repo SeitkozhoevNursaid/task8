@@ -57,6 +57,7 @@ class RegistrationSerializer(serializers.Serializer):
         validated_data.pop('password2')
         validated_data.setdefault('last_change_password', timezone.now())
         user = CustomUser.objects.create_user(**validated_data)
+        print(f"ssssssssss{validated_data['email']}")
         send_activation_code.delay(validated_data['email'], user.activation_code)
         
         UserPasswords.objects.create(password=user.password, user=user)
