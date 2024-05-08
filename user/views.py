@@ -73,7 +73,7 @@ class ConfirmForgotPassword(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response('Вы успешно сменили ваш пароль!)', status=status.HTTP_200_OK) # TODO
+        return Response('Вы успешно сменили ваш пароль!)', status=status.HTTP_200_OK)
 
 
 class AdminResetPassword(APIView):

@@ -80,7 +80,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def validate(self, data):
         email = self.context['email']
-        user = CustomUser.objects.get(email=email)
+        user = CustomUser.objects.get(email=email)  # TODO: related_name
         password_list = UserPasswords.objects.filter(user=user).order_by('-created_at')[:4]
 
         if not re.findall('\d', data['new_password']):

@@ -95,5 +95,6 @@ def send_car_data(chat_id, data):
             bot.send_message(chat_id, message)
 
 
-polling = threading.Thread(target=polling_thread)
-polling.start()
+def start():
+    polling = threading.Thread(target=polling_thread)
+    polling.start()

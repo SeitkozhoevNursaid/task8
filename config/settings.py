@@ -11,17 +11,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
-from decouple import AutoConfig
+from decouple import config
 from datetime import timedelta
 
-config = AutoConfig()
+# config = AutoConfig()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -32,9 +28,8 @@ DEBUG = config('DEBUG', cast=bool)
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
-AUTH_USER_MODEL = 'user.CustomUser'
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #apps,
-
     'user',
     'car',
 
@@ -94,12 +88,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('NAME'),
+        'NAME': config('NAME'),  # TODO: DB_NAME
         'USER': config('USER'),
         'PASSWORD': config('PASSWORD'),
         'HOST': config('HOST'),
-        'PORT': config('PORT'),
-        'OPTIONS': {}
+        'PORT': config('PORT')
     }
 }
 
@@ -147,11 +140,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #JWT configuration
-SIMPLE_JWT = {
+SIMPLE_JWT = {  # TODO: last_login 
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=155),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "AUTH_HEADER_TYPES": ("Bearer", "Token")
 }
+
+AUTH_USER_MODEL = 'user.CustomUser'  # TODO: at the down
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

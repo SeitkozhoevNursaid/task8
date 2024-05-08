@@ -16,7 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CarUpdateSerializer(serializers.Serializer):
+class CarUpdateSerializer(serializers.Serializer):  # TODO: recode
     name = serializers.CharField(
         max_length=50,
         write_only=True,
@@ -35,31 +35,30 @@ class CarUpdateSerializer(serializers.Serializer):
         write_only=True,
         required=False
     )
-    images = serializers.ImageField(
-        required=False,
-    )
 
     def validate(self, data):
-        category_name = data['category']
-        if data == dict():
+        if data == dict():  # TODO: ????
             raise serializers.ValidationError(
                 ('Вы ничего не заполнили!'),
             )
 
-        if not Category.objects.filter(name=category_name).exists():
-            raise serializers.ValidationError(
-                ('Такой категории не существует')
-            )
-
         return data
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # TODO ???
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        category_name = validated_data.get('category', instance.category)
+        if category_name:
+            category, categor = Category.objects.get_or_create(name=category_name)
+            instance.category = category
+        else:
+            instance.category
+        instance.save()
         return instance
 
 
-class CarImgSerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField()
-    images = serializers.ImageField(max_length=None, use_url=True)
+class CarImgSerializer(serializers.ModelSerializer):  # TODO: Incorrect
 
     class Meta:
         model = CarImg
@@ -68,6 +67,10 @@ class CarImgSerializer(serializers.ModelSerializer):
 
 class CarCreateSerializer(serializers.ModelSerializer):
     img = serializers.FileField(required=False)
+    
+    class Meta:
+        model = Car
+        fields = '__all__'
 
     def create(self, validated_data):
         img = validated_data.pop('img')
@@ -78,35 +81,3 @@ class CarCreateSerializer(serializers.ModelSerializer):
             images.append(CarImg(name=car, images=file))
         CarImg.objects.bulk_create(images)
         return car
-
-    class Meta:
-        model = Car
-        fields = '__all__'
-
-
-class CarParsingSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(
-        max_length=50,
-        write_only=True,
-        required=False
-    )
-    description = serializers.CharField(
-        max_length=250,
-        write_only=True,
-        required=False
-    )
-    price = serializers.IntegerField(
-        write_only=True,
-        required=False
-    )
-    category = serializers.CharField(
-        write_only=True,
-        required=False
-    )
-    images = serializers.ImageField(
-        required=False,
-    )
-
-    class Meta:
-        model = Car
-        fields = '__all__'

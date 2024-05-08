@@ -1,16 +1,12 @@
 from django.urls import path
 
-from car.views import (
-    CarCreateAPIView,
-    CarDestroyAPIView,
-    CarListAPIView,
+from car.views import (CarCreateAPIView, CarDestroyAPIView, CarListAPIView,
     CarRetrieveAPIView,
     CarUpdateAPIView,
     CarImgRetrieveDestroyUpdate,
     CarParsingAPIView,
     TestParsing,
     CarImgListAPIView)
-from car import telegram
 
 urlpatterns = [
     path('cars/', CarListAPIView.as_view()),
