@@ -63,4 +63,4 @@ class UserPasswords(models.Model):
         verbose_name_plural = 'Пароли пользователя'
 
     def __str__(self):
-        return self.user
+        return str(self.user)

@@ -6,5 +6,5 @@ class CarConfig(AppConfig):
     name = 'car'
 
     # def ready(self):
-    #     from car.telegram import start    
+    #     from car.telegram import start
     #     start()

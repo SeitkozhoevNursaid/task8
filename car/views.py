@@ -79,7 +79,7 @@ class CarParsingAPIView(APIView):
         url = f"https://m.mashina.kg/new/search/{name}"
         try:
             page = requests.get(url)
-            soup = BeautifulSoup(page.text, 'html.parser')
+            soup = BeautifulSoup(page.text, 'lxml')
 
             list_div = soup.find_all('div', class_='listing-item main')
             cars_data = []
@@ -103,23 +103,24 @@ class TestParsing(APIView):
         url = 'https://m.mashina.kg/new/details/kia-k5-63ca2c96a9779355251584'
         
         page = requests.get(url)
-        soup = BeautifulSoup(page.text, 'html.parser')  # lxml look at it
+        soup = BeautifulSoup(page.text, 'lxml')  # lxml look at it
         
         container = soup.find('div', class_='characteristics')
-        # print(container)
-        description_element = container.find_all('div', class_='info')
-        for i in description_element:
-            print(i.text.strip())
+        print(container.text.strip())
+        # description_element = container.find_all('div', class_='info')
+        # for i in description_element:
+        #     print(i.text.strip())
 
         # """Категория"""
-        # for category_element in description_element:
-        #     category_element = description_element.find_all('div', class_='info')
-        #     categoryslice = category_element[1]
-        #     category_value = categoryslice.find('span', class_='value')
-        #     if category_element:
-        #         category = category_value.get_text(strip=True)
-        #     else:
-        #         category = 'Нет категории'
+        # category_element = [container.find_all('div', class_='info') for i in container][1]
+        # for category_value in category_element:
+        #     category_value = category_element.find('span', class_='value')
+        # print(category_value)
+            # category_value = categoryslice.find('span', class_='value')
+            # if category_element:
+            #     category = category_value.get_text(strip=True)
+            # else:
+            #     category = 'Нет категории'
 
         # """Описание"""
         # if description_element:

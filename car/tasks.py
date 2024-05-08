@@ -9,7 +9,7 @@ from car.models import Car, Category, CarImg
 def parse_car_page(url):
     try:
         page = requests.get(url)
-        soup = BeautifulSoup(page.text, 'html.parser')
+        soup = BeautifulSoup(page.text, 'lxml')
         description_element = soup.find('div', class_='characteristics')
 
         """Категория"""
